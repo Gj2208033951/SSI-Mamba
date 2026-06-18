@@ -1,52 +1,111 @@
+
 # SSI-Mamba
 
-## Data Preparation
+SSI-Mamba is a multimodal Siamese deep learning framework for silencer–silencer interaction (SSI) prediction.
 
-First, download the required histone modification files for your target cell line from the [ENCODE database](https://www.encodeproject.org/).
+## Environment
 
-For example, for the **GM12878** cell line, you may download:
+The software environment used in this study is provided through:
 
-```text
-GM12878_H3K27me3.bigWig
-```
+* requirements.txt
 
-In addition, download the corresponding reference genome sequence file in `.fa` format, such as:
+Main dependencies:
 
-```text
-hg38.fa
-```
+* Python 3.10
+* PyTorch 2.0.0
+* CUDA 11.8
+* Mamba-SSM 1.0.1
+* Captum 0.9.0
+* SHAP 0.49.1
 
-## Configure File Paths
+## Input Data
 
-After downloading the required files, modify the corresponding file paths in `Train.py`, including:
+The model takes two modalities as input:
 
-* The histone modification `.bigWig` file (e.g., `GM12878_H3K27me3.bigWig`)
-* The DNA sequence `.fa` file corresponding to the target species (e.g., `hg38.fa`)
-* The silencer-silencer interaction dataset for the target cell line
+### DNA Sequence
 
-Example:
+Each anchor is represented as a 200 × 6 matrix:
 
-```python
-histone_file = "/path/to/GM12878_H3K27me3.bigWig"
-genome_file = "/path/to/hg38.fa"
-interaction_file = "/path/to/silencer_interaction_dataset"
-```
+* A
+* C
+* G
+* T
+* N
+* Anchor Mask
 
-Please replace the example paths with the actual locations of your downloaded files.
+### Histone Modification Signals
 
-## Model Training
+Each anchor is represented as a 200 × 6 matrix:
 
-After configuring all file paths, run the following command to train the model:
+* H3K4me3
+* H3K9me3
+* H3K36me3
+* H3K4me1
+* H3K9ac
+* H3K27ac
+
+The final model therefore receives:
+
+* Anchor1 Sequence
+* Anchor2 Sequence
+* Anchor1 Histone Signal
+* Anchor2 Histone Signal
+
+## Data Sources
+
+### Reference Genome
+
+* hg38 (human)
+* mm10 (mouse)
+
+### Histone Modification Signals
+
+Histone modification bigWig files can be downloaded from ENCODE:
+
+https://www.encodeproject.org/
+
+The accession identifiers used in this study are listed in Supplementary Table S1.
+
+### Chromatin Interaction Data
+
+Chromatin interaction datasets were obtained from Loop Catalog.
+
+The GEO accession identifiers used in this study are listed in Supplementary Table S2.
+
+## Training
+
+Modify the paths in Train.py:
+
+* reference genome (.fa)
+* histone bigWig files
+* DNA dataset
+
+Run:
 
 ```bash
 python Train.py
 ```
 
-## Prediction
+## Evaluation
 
-You can also use `test.py` to perform predictions with the trained model weights:
+Download the trained model weights and modify the checkpoint path in test.py.
+
+Run:
 
 ```bash
 python test.py
 ```
+
+## Model Weights
+
+You can also directly make predictions by using the trained weights.
+
+## Reproducibility
+
+All experiments were conducted using:
+
+* NVIDIA A800-SXM4-80GB
+* PyTorch 2.0.0
+* CUDA 11.8
+* Mamba-SSM 1.0.1
 
